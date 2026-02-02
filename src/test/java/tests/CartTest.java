@@ -29,52 +29,58 @@ public class CartTest {
 
         submitButton.click();
     }
-    @Given("user is on the products page")
+
+    @And("user is on the products page")
     public void user_is_on_the_products_page() {
-        WebElement title = driver.findElement(By.className("title"));
-        Assert.assertEquals("Products",title.getText());
+        String pageTitle = driver.findElement(By.className("title")).getText();
+        Assert.assertEquals("Products", pageTitle);
     }
+
     @When("user adds {string} to the cart")
-    public void user_adds_to_the_cart(String productItem) {
-        WebElement product = driver.findElement(By.xpath("//div[text()='" + productItem + "']/ancestor::div[@class='inventory_item']//button"));
-        product.click();
-
-
+    public void user_adds_item_to_the_cart(String itemName) {
+        driver.findElement(
+                By.xpath("//div[text()='" + itemName + "']/ancestor::div[@class='inventory_item']//button")
+        ).click();
     }
+
     @Then("cart icon should show {string}")
-    public void cartIcon(String num) {
-        WebElement cartNum = driver.findElement(By.xpath("//span[@data-test='shopping-cart-badge']"));
-        Assert.assertEquals(cartNum.getText(),num);
-
-
-    }
-    @Then("the cart should contain {string}")
-    public void the_cart_should_contain(String cartItem) {
-        WebElement clickCart = driver.findElement(By.xpath("//a[@data-test='shopping-cart-link']"));
-        clickCart.click();;
-        WebElement cart = driver.findElement(By.xpath("//div[@data-test='inventory-item-name']"));
-        Assert.assertEquals(cart.getText(),cartItem);
+    public void cart_icon_should_show(String count) {
+        String cartCount = driver.findElement(By.className("shopping_cart_badge")).getText();
+        Assert.assertEquals(count, cartCount);
     }
 
+    @And("the cart should contain {string}")
+    public void the_cart_should_contain(String itemName) {
+        driver.findElement(By.className("shopping_cart_link")).click();
+        String itemInCart = driver.findElement(By.className("inventory_item_name")).getText();
+        Assert.assertEquals(itemName, itemInCart);
+    }
 
-    @Given("user has {string} in the cart")
-    public void userHasInTheCart(String IncartItem) {
-        WebElement product = driver.findElement(By.xpath("//div[text()='Sauce Labs Backpack']"));
-        Assert.assertEquals(product.getText(),IncartItem);
+    @Given("the cart contains {string}")
+    public void the_cart_contains(String itemName) {
+        user_adds_item_to_the_cart(itemName);
+        the_cart_should_contain(itemName);
     }
 
     @When("user removes {string} from the cart")
-    public void RemovesFromTheCart(String removeItem) {
-        WebElement removeProduct = driver.findElement(By.xpath("//button[text()='Remove']"));
-        removeProduct.click();
+    public void user_removes_item_from_the_cart(String itemName) {
+        driver.findElement(
+                By.xpath("//div[text()='" + itemName + "']/ancestor::div[@class='cart_item']//button")
+        ).click();
+    }
 
+    @Then("cart icon should be empty")
+    public void cart_icon_should_be_empty() {
+        Assert.assertTrue(
+                driver.findElements(By.className("shopping_cart_badge")).isEmpty()
+        );
     }
 
     @And("the cart should not contain {string}")
-    public void theCartShouldNotContain(String empty) {
-
-        WebElement cartEmpty = driver.findElement(By.xpath("//span[@data-test='shopping-cart-badge']"));
-        Assert.assertEquals(cartEmpty.getText(),empty);
+    public void the_cart_should_not_contain(String itemName) {
+        Assert.assertTrue(
+                driver.findElements(By.xpath("//div[text()='" + itemName + "']")).isEmpty()
+        );
+        driver.quit();
     }
-
 }
