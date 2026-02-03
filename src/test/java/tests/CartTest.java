@@ -1,6 +1,5 @@
 package tests;
 
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -8,7 +7,6 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 public class CartTest {
 
@@ -17,23 +15,20 @@ public class CartTest {
     @Given("user is logged in")
     public void user_is_logged_in() {
         driver = Hooks.driver;
-        WebElement usernameInput = driver.findElement(By.id("user-name"));
-        WebElement passwordInput = driver.findElement(By.id("password"));
-        WebElement submitButton = driver.findElement(By.id("login-button"));
 
-        usernameInput.clear();
-        usernameInput.sendKeys("standard_user");
+        driver.findElement(By.id("user-name")).clear();
+        driver.findElement(By.id("user-name")).sendKeys("standard_user");
 
-        passwordInput.clear();
-        passwordInput.sendKeys("secret_sauce");
+        driver.findElement(By.id("password")).clear();
+        driver.findElement(By.id("password")).sendKeys("secret_sauce");
 
-        submitButton.click();
+        driver.findElement(By.id("login-button")).click();
     }
 
     @And("user is on the products page")
     public void user_is_on_the_products_page() {
-        String pageTitle = driver.findElement(By.className("title")).getText();
-        Assert.assertEquals("Products", pageTitle);
+        String title = driver.findElement(By.className("title")).getText();
+        Assert.assertEquals("Products", title);
     }
 
     @When("user adds {string} to the cart")
@@ -45,21 +40,25 @@ public class CartTest {
 
     @Then("cart icon should show {string}")
     public void cart_icon_should_show(String count) {
-        String cartCount = driver.findElement(By.className("shopping_cart_badge")).getText();
-        Assert.assertEquals(count, cartCount);
+        String badgeText = driver.findElement(By.className("shopping_cart_badge")).getText();
+        Assert.assertEquals(count, badgeText);
     }
 
     @And("the cart should contain {string}")
     public void the_cart_should_contain(String itemName) {
         driver.findElement(By.className("shopping_cart_link")).click();
-        String itemInCart = driver.findElement(By.className("inventory_item_name")).getText();
-        Assert.assertEquals(itemName, itemInCart);
+
+        Assert.assertFalse(
+                driver.findElements(
+                        By.xpath("//div[@class='cart_item']//div[text()='" + itemName + "']")
+                ).isEmpty()
+        );
     }
 
     @Given("the cart contains {string}")
     public void the_cart_contains(String itemName) {
         user_adds_item_to_the_cart(itemName);
-        the_cart_should_contain(itemName);
+        driver.findElement(By.className("shopping_cart_link")).click();
     }
 
     @When("user removes {string} from the cart")
@@ -79,8 +78,9 @@ public class CartTest {
     @And("the cart should not contain {string}")
     public void the_cart_should_not_contain(String itemName) {
         Assert.assertTrue(
-                driver.findElements(By.xpath("//div[text()='" + itemName + "']")).isEmpty()
+                driver.findElements(
+                        By.xpath("//div[@class='cart_item']//div[text()='" + itemName + "']")
+                ).isEmpty()
         );
-        driver.quit();
     }
 }
