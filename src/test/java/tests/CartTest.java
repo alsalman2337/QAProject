@@ -1,5 +1,6 @@
 package tests;
 
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -7,6 +8,7 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class CartTest {
 
@@ -82,5 +84,26 @@ public class CartTest {
                         By.xpath("//div[@class='cart_item']//div[text()='" + itemName + "']")
                 ).isEmpty()
         );
+    }
+
+    @When("user clicks on the cart logo user lands on the carts page")
+    public void userClicksOnTheCartLogoUserLandsOnTheCartsPage() {
+        WebElement clickCrtBtn = driver.findElement(By.className("shopping_cart_link"));
+        clickCrtBtn.click();
+
+    }
+
+    @Then("user validates the {string} URL")
+    public void userValidatesTheURL(String url) {
+        String ActualUrl = driver.getCurrentUrl();
+        Assert.assertEquals(ActualUrl,url);
+
+
+    }
+
+    @And("user validates the {string} page title")
+    public void userValidatesThePageTitle(String CartTitle) {
+        WebElement getCartTitle = driver.findElement(By.xpath("//span[text()='Your Cart']"));
+        Assert.assertEquals(getCartTitle.getText(),CartTitle);
     }
 }

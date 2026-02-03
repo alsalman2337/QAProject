@@ -11,7 +11,7 @@ import io.cucumber.junit.CucumberOptions;
         plugin = {"pretty", "html:target/cucumber-reports.html"}, // reporting
         //monochrome = true,                         // readable console output
         //dryRun = false,                            // true = checks missing steps, false = runs tests
-        tags = "@CartTest"                            // optional: run only scenarios with this tag
+        tags = "@test3"                            // optional: run only scenarios with this tag
 )
 public class TestRunner {
 
